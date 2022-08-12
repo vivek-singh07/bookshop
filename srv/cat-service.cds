@@ -5,7 +5,7 @@ service AdminService @(requires : 'admin') {
     entity Authors as projection on my.Authors;
 }
  
-service CatalogService @(path : '/browsebook') {
+service CatalogService @(path : '/browse') {
     @readonly
     entity ListOfBooks as projection on Books excluding {
         descr
