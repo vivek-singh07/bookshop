@@ -11,10 +11,13 @@
     "express": "^4"
   },
   "devDependencies": {
+    "@sap/ux-specification": "^1.102.3",
     "sqlite3": "^5.0.4"
   },
   "scripts": {
-    "start": "cds run"
+    "start": "cds run",
+    "watch-bookadmin": "cds watch --open bookadmin/webapp/index.html?sap-ui-xx-viewCache=false",
+    "watch-orderbooks": "cds watch --open orderbooks/webapp/index.html?sap-ui-xx-viewCache=false"
   },
   "eslintConfig": {
     "extends": "eslint:recommended",
@@ -47,5 +50,10 @@
         "kind": "sql"
       }
     }
-  }
+  },
+  "sapux": [
+    "app/bookadmin",
+    "app/orderbooks",
+    "app/bookadmin"
+  ]
 }

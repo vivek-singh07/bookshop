@@ -1,16 +1,20 @@
 sap.ui.define(
   [
-    "sap/ui/core/mvc/Controller",
+    "./BaseController",
     "sap/ui/model/json/JSONModel",
     "sap/ui/model/Filter",
     "sap/ui/model/FilterOperator",
   ],
-  function (Controller, JSONModel, Filter, FilterOperator) {
+  /**
+   * @param {typeof sap.ui.core.mvc.Controller} Controller
+   */
+  function (BaseController, JSONModel, Filter, FilterOperator) {
     "use strict";
-    return Controller.extend("sap.codejam.controller.App", {
+
+    return BaseController.extend("ns.orderbooks.controller.App", {
       onInit: function () {
         this.getView().setModel(
-          new JSONModel({ selectedQuantity: 1 , itemSelected: true}),
+          new JSONModel({ selectedQuantity: 1, itemSelected: true }),
           "userSelection"
         );
       },
@@ -20,58 +24,52 @@ sap.ui.define(
           .getSource()
           .getBindingContext()
           .getPath();
-        let selectedModelData = oEvent
-          .getSource()
+
+        this.getView()
           .getModel()
-          .getProperty(selectedModelPath);
-        oModel.setProperty("/selectedModelPath", selectedModelPath);
-        oModel.setProperty("/selectedModelData", selectedModelData);
-        oModel.setProperty("/itemSelected", true)
+          .bindContext(selectedModelPath)
+          .requestObject()
+          .then(function (value) {
+            oModel.setProperty("/selectedModelPath", selectedModelPath);
+            oModel.setProperty("/selectedModelData", value);
+            oModel.setProperty("/itemSelected", true);
+          });
       },
       onSubmitOrder: function () {
         let oView = this.getView();
+        let oModel = oView.getModel();
         let userSelectionData = oView.getModel("userSelection").getData();
         if (!userSelectionData.selectedModelData) {
           oView.byId("orderStatus").setText("Select a line!");
           oView.byId("orderStatus").setState("Error");
           return;
         }
-        let reqSettings = {
-          url: "/browse/submitOrder",
-          method: "POST",
-          timeout: 0,
-          headers: {
-            "Content-type": "application/json",
-          },
-          data: JSON.stringify({
-            book: userSelectionData.selectedModelData.ID,
-            quantity: userSelectionData.selectedQuantity,
-          }),
-        };
+        let oObjectBinding = oView.byId("orderFlexBox").getObjectBinding();
 
-        jQuery
-          .ajax(reqSettings)
-          .done(function (response) {
+        oObjectBinding.setParameter(
+          "book",
+          userSelectionData.selectedModelData.ID
+        );
+        oObjectBinding.setParameter(
+          "quantity",
+          userSelectionData.selectedQuantity
+        );
+        oObjectBinding.execute().then(
+          function () {
+            oModel.refresh();
             oView.byId("orderStatus").setText(
               `Order successful 
-                    (${userSelectionData.selectedModelData.title}, 
-                    ${userSelectionData.selectedQuantity} pcs.)`
+                              (${userSelectionData.selectedModelData.title}, 
+                              ${userSelectionData.selectedQuantity} pcs.)`
             );
             oView.byId("orderStatus").setState("Success");
-            let userSelectedPath = oView
-              .getModel("userSelection")
-              .getProperty("/selectedModelPath");
-            oView
-              .getModel()
-              .setProperty(userSelectedPath + "/stock", response.stock);
-            oView
-              .getModel("userSelection")
-              .setProperty("/selectedModelData/stock", response.stock);
-          })
-          .fail(function (response) {
-            oView.byId("orderStatus").setText("Error");
+          },
+          function (oError) {
+            oView.byId("orderStatus").setText(oError.message);
             oView.byId("orderStatus").setState("Error");
-          });
+          }
+        );
+
       },
       onSearch: function (oEvent) {
         var aFilter = [];
@@ -87,7 +85,7 @@ sap.ui.define(
         oModel.setProperty("/selectedModelPath", {});
         oModel.setProperty("/selectedModelData", {});
         this.getView().byId("orderStatus").setText("");
-        oModel.setProperty("/itemSelected", false)
+        oModel.setProperty("/itemSelected", false);
       },
     });
   }

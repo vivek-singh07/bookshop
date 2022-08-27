@@ -1,6 +1,6 @@
 using {my.bookshop as my} from '../db/schema';
 
-service AdminService @(requires : 'admin') {
+service AdminService  {
     entity Books   as projection on my.Books;
     entity Authors as projection on my.Authors;
 }
@@ -11,7 +11,6 @@ service CatalogService @(path : '/browse') {
         descr
     };
 
-    @readonly
     entity Books       as projection on my.Books {
         *, 
         author.name as author 

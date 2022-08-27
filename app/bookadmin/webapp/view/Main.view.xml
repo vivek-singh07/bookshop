@@ -1,0 +1,7 @@
+<mvc:View controllerName="ns.bookadmin.controller.Main"
+    xmlns:mvc="sap.ui.core.mvc" xmlns="sap.m">
+    <Page id="page" title="{i18n>title}">
+        <content>
+        </content>
+    </Page>
+</mvc:View>

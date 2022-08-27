@@ -1,17 +1,14 @@
 <mvc:View
-    xmlns="sap.m"
-    xmlns:mvc="sap.ui.core.mvc"
-    controllerName="sap.codejam.controller.App">
-
-    <App>
-        <pages>
-            <Page title="Bookshop">
+controllerName="ns.orderbooks.controller.Main"    
+xmlns="sap.m"
+xmlns:mvc="sap.ui.core.mvc">
+<Page id="page" title="Bookshop">
                 <content>
                     <Panel headerText="Hi, Please place your order">
                         <content>
                             <SearchField liveChange=".onSearch"/>
                             <Table 
-                                items="{/value}"
+                                items="{/Books}"
                                 id="booksTable">
                                 <columns>
                                     <Column>
@@ -48,7 +45,8 @@
                                 </items>
                             </Table>
                             <FlexBox direction="Column" class="sapUiMediumMarginTop">
-                                <FlexBox alignItems="Center" justifyContent="End" class="orderControls" >
+                                <FlexBox id="orderFlexBox" alignItems="Center" justifyContent="End" class="orderControls" 
+                                         binding="{/submitOrder(...)}">
                                     <ObjectStatus id="orderStatus" text=""/>
                                     <Button text="Order" press=".onSubmitOrder" />
                                     <StepInput
@@ -68,7 +66,4 @@
                     </Panel>
                 </content>
             </Page>
-        </pages>
-    </App>
-
-</mvc:View>
+</mvc:View>            

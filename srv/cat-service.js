@@ -5,11 +5,11 @@ class CatalogService extends cds.ApplicationService { init(){
 
     this.on('submitOrder', async req => {
         const {book,quantity} = req.data
-        if (quantity < 1) return req.reject(400, `quantity has to be more 1 or more`)
+        if (quantity < 1) return req.reject(400, `QUANTITY_MORE_THAN_ZERO`)
         let b = await SELECT .from(Books,book) .columns('stock')
-        if (!b) return req.error(404,`Book #${book} dosen't exist`)
+        if (!b) return req.error(404,`INVALID_BOOK`,[book])
         let {stock} = b
-        if (quantity > stock) return req.error(409,`${quantity} cannot be greater than stock`)
+        if (quantity > stock) return req.error(409,`QUANTITY_MORE_THAN_STOCK`)
         await UPDATE (Books,book) .with({ stock: stock -= quantity })
         this.emit('OrderedBook', {book, quantity, buyer:req.user.id})
         return { stock }
